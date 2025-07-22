@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace UI_Editor
 {
-    enum OnClick
+    enum Function
     {
         None,
         ChangeScene
@@ -15,6 +15,9 @@ namespace UI_Editor
         public Color BackgroundColor { get; set; }
         public Vector2 Position { get; set; }
         public Vector2 Size { get; set; }
+
+        public Function OnHover = Function.None;
+        public Function OnClick = Function.None;
 
         public Element(Vector2 pos, Vector2 size, string text, Color backgroundColor)
         {
