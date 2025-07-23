@@ -11,6 +11,7 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -36,8 +37,10 @@ public class Game1 : Game
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+        InputManager.Update();
 
         // TODO: Add your update logic here
+        UI.Update();
 
         base.Update(gameTime);
     }
@@ -49,8 +52,8 @@ public class Game1 : Game
         // TODO: Add your drawing code here
 
         _spriteBatch.Begin();
-        
 
+        UI.Draw(_spriteBatch);
         
         _spriteBatch.End();
 
