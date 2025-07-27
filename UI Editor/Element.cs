@@ -1,77 +1,113 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Text.Json;
+using System.IO;
+using System.Transactions;
+using System.Diagnostics;
 
 namespace UI_Editor
 {
+    enum ElementType
+    {
+        Box
+    }
+
     abstract class Element
     {
-        public Texture2D _texture { get; set; }
+        public ElementSerializationData SerializationData { get; set; }
         public string Text { get; set; }
         public Color BackgroundColor { get; set; }
-        public Vector2 Position { get; set; }
-        public Vector2 Size { get; set; }
+        public Point Position { get; set; }
+        public Point Size { get; set; }
 
-        public Action Hovering;
-        public Action Clicked;
+        public Action OnHover;
+        public Action OnClick;
 
         public bool IsInteractable = true;
         public bool IsVisible = true;
 
-        public Element(GraphicsDevice graphicsDevice, Vector2 pos, Vector2 size, string text, Color backgroundColor)
+        public Element(Point position, Point size, string text, Color backgroundColor)
         {
-            // creating the 1 pixel texture
-            _texture = new Texture2D(graphicsDevice, width: 1, height: 1);
-            _texture.SetData(new[] { Color.White });
-
-            Position = pos;
+            Position = position;
             Size = size;
+            Text = text;
             BackgroundColor = backgroundColor;
         }
 
-        public void OnHover()
+        public void Hovering()
         {
             Console.WriteLine("Hovering");
-            Hovering?.Invoke();
+            OnHover?.Invoke();
         }
 
-        public void OnClick()
+        public void Clicked()
         {
             Console.WriteLine("Clicked");
-            Clicked?.Invoke();
+            OnClick?.Invoke();
         }
 
-        public void Update()
+        public void Update(Point windowSize)
         {
-            Rectangle hitbox = GetRectangle();
+            Rectangle hitbox = GetRectangle(windowSize);
             if (hitbox.Contains(InputManager.GetMousePos()))
             {
-                OnHover();
+                Hovering();
                 if (InputManager.WasMouseButtonPressed(MouseButtons.LeftButton))
-                    OnClick();
+                    Clicked();
             }
 
         }
 
-        public Rectangle GetRectangle()
-            => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+        public Rectangle GetRectangle(Point windowSize)
+            => new Rectangle(
+                (int)(Position.X * windowSize.X * 0.01),
+                (int)(Position.Y * windowSize.Y * 0.01),
+                (int)(Size.X * windowSize.X * 0.01),
+                (int)(Size.Y * windowSize.Y * 0.01));
 
-        public abstract void Draw(SpriteBatch spriteBatch);
+        public abstract void Draw(Texture2D _texture, SpriteBatch spriteBatch, Point windowSize);
 
-        public void GetJsonString()
+        //public void GetJsonString()
+        //{
+        //    string jsonText = JsonSerializer.Serialize( new
+        //    {
+        //        ElementPosition = { Position.X, Position.Y},
+        //        ElementSize = { Size.X, Size.Y
+        //    }
+        //    , new JsonSerializerOptions { WriteIndented = true });
+        //    File.WriteAllText("Elements.json", jsonText);
+        //}
+
+        public string GetJson()
         {
-
+            Debug.WriteLine($"{{\n\t\"Type\" = \"{SerializationData.Type}\",\n\t\"IsInteractable\" = \"{SerializationData.IsInteractable}\"\n}}");
+            return JsonSerializer.Serialize(SerializationData, new JsonSerializerOptions { WriteIndented = true });
         }
     }
 
     class Box : Element
     {
-        public Box(GraphicsDevice graphicsDevice, Vector2 pos, Vector2 size, string text, Color backgroundColor) : base(graphicsDevice, pos, size, text, backgroundColor) { }
+        public const ElementType Type = ElementType.Box;
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public Box(Point position, Point size, string text, Color backgroundColor) : base(position, size, text, backgroundColor)
         {
-            Rectangle destinationRect = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+            SerializationData = new ElementSerializationData(Type, position, size, text, backgroundColor, IsInteractable, IsVisible);
+            Debug.WriteLine(SerializationData.Type.ToString());
+        }
+
+        public override void Draw(Texture2D _texture, SpriteBatch spriteBatch, Point windowSize)
+        {
+            Rectangle destinationRect = GetRectangle(windowSize);
             spriteBatch.Draw(_texture, destinationRect, BackgroundColor);
         }
     }
 }
+
+
+/*
+ *  ** TO DO **
+ *  Add custom functions that can be stored 
+ * 
+ * 
+ */

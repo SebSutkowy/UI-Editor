@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Diagnostics;
 
 namespace UI_Editor;
 
@@ -11,6 +13,7 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+    private Point _windowSize;
 
     public Game1()
     {
@@ -22,6 +25,10 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
+        _graphics.PreferredBackBufferWidth = 1000;
+        _graphics.PreferredBackBufferHeight = 1000;
+        _graphics.IsFullScreen = false;
+        _graphics.ApplyChanges();
 
         base.Initialize();
     }
@@ -31,6 +38,20 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // TODO: use this.Content to load your game content here
+        _windowSize = new Point(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+        Point position = new Point(90, 10); // Size and Position are now in percentages of the screen size
+        Point size = new Point(10, 3);
+        string text = "";
+        Color backgroundColor = new Color(254, 1, 154);
+        Box box = new Box(
+            position,
+            size,
+            text,
+            backgroundColor
+        );
+        box.OnClick += () => Debug.WriteLine(box.GetJson());
+        UI.Import(GraphicsDevice, _windowSize);
+        UI.AddNewBox(box);
     }
 
     protected override void Update(GameTime gameTime)
