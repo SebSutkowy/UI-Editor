@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace UI_Editor
 {
@@ -7,32 +9,45 @@ namespace UI_Editor
         Translate,
         ChangeScene,
         Resize,
-        ChangeColor
+        ChangeColor,
+        CustomDebug
     }
 
     enum Transition
     {
-        None,
-        Linear,
-        Logarithmic,
-        Exponential
+        None=0,
+        Linear=1,
+        Logarithmic=2,
+        Exponential=3
     }
 
-    class Functions
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "Function")]
+    [JsonDerivedType(typeof(Debugging), "Debugging")]
+    [JsonDerivedType(typeof(Translate), "Translate")]
+    internal class Functions
     {
+        public void Execute(Element element) { }
     }
 
-    class Translate : Functions
+    internal class Translate : Functions
     {
-        public PointSerializable translationDistance { get; set; }
-        public Transition translationTransition { get; set; }
+        public PointSerializable translation { get; set; }
+        public Transition transition { get; set; }
 
-        public Translate(Point translation, Transition transition)
+        public void Execute(Element element)
         {
-            translationDistance = new PointSerializable(translation);
-            translationTransition = transition;
+            // translation here
         }
+    }
 
+    internal class Debugging : Functions
+    {
+        public int number { get; set; }
+        public Transition transition { get; set; }
+        public PointSerializable translation { get; set; }
+        public void Execute(Element element)
+        {
 
+        }
     }
 }

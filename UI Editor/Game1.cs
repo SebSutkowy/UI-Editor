@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace UI_Editor;
 
@@ -49,6 +50,13 @@ public class Game1 : Game
             text,
             backgroundColor
         );
+        Debugging func = new Debugging
+        {
+            number = 2,
+            transition = Transition.Logarithmic,
+            translation = new PointSerializable(new Point(80, 10))
+        };
+        box.AddOnClick(func);
         box.OnClick += () => Debug.WriteLine(box.GetJson());
         UI.Import(GraphicsDevice, _windowSize);
         UI.AddNewBox(box);

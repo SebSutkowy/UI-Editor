@@ -59,6 +59,19 @@ namespace UI_Editor
 
         }
 
+        public void AddOnHover(Functions function)
+        {
+            OnHover += () => function.Execute(this);
+            SerializationData.OnHoverFunctions.Add(function);
+        }
+
+        public void AddOnClick(Functions function)
+        {
+            OnClick += () => function.Execute(this);
+            SerializationData.OnClickFunctions.Add(function);
+        }
+
+
         public Rectangle GetRectangle(Point windowSize)
             => new Rectangle(
                 (int)(Position.X * windowSize.X * 0.01),
@@ -81,7 +94,7 @@ namespace UI_Editor
 
         public string GetJson()
         {
-            Debug.WriteLine($"{{\n\t\"Type\" = \"{SerializationData.Type}\",\n\t\"IsInteractable\" = \"{SerializationData.IsInteractable}\"\n}}");
+            //Debug.WriteLine($"{{\n\t\"Type\" = \"{SerializationData.Type}\",\n\t\"IsInteractable\" = \"{SerializationData.IsInteractable}\"\n}}");
             return JsonSerializer.Serialize(SerializationData, new JsonSerializerOptions { WriteIndented = true });
         }
     }
