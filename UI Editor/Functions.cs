@@ -24,9 +24,10 @@ namespace UI_Editor
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "Function")]
     [JsonDerivedType(typeof(Debugging), "Debugging")]
     [JsonDerivedType(typeof(Translate), "Translate")]
-    internal class Functions
+    [JsonDerivedType(typeof(ChangeColor), "ChangeColor")]
+    abstract class Functions
     {
-        public void Execute(Element element) { }
+        public abstract void Execute(Element element);
     }
 
     internal class Translate : Functions
@@ -34,20 +35,32 @@ namespace UI_Editor
         public PointSerializable translation { get; set; }
         public Transition transition { get; set; }
 
-        public void Execute(Element element)
+        public override void Execute(Element element)
         {
             // translation here
+            switch(transition)
+            {
+                default:
+                    element.Position += translation.ToPoint();
+                    break;
+            }
+        }
+    }
+
+    internal class ChangeColor : Functions
+    {
+        public Color NewColor { get; set; }
+        public override void Execute(Element element)
+        {
+            element.BackgroundColor = NewColor;
         }
     }
 
     internal class Debugging : Functions
     {
-        public int number { get; set; }
-        public Transition transition { get; set; }
-        public PointSerializable translation { get; set; }
-        public void Execute(Element element)
+        public override void Execute(Element element)
         {
-
+            Debug.WriteLine(element.GetJson());
         }
     }
 }

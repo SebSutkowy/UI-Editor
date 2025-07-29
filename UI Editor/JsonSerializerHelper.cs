@@ -58,7 +58,7 @@ namespace UI_Editor
             OnClickFunctions = new List<Functions>();
         }
 
-        public Element? CreateElement()
+        public Element CreateElement()
         {
             switch(Type)
             {

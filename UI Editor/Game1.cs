@@ -40,7 +40,7 @@ public class Game1 : Game
 
         // TODO: use this.Content to load your game content here
         _windowSize = new Point(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
-        Point position = new Point(90, 10); // Size and Position are now in percentages of the screen size
+        Point position = new Point(25, 10); // Size and Position are now in percentages of the screen size
         Point size = new Point(10, 3);
         string text = "";
         Color backgroundColor = new Color(254, 1, 154);
@@ -50,14 +50,18 @@ public class Game1 : Game
             text,
             backgroundColor
         );
-        Debugging func = new Debugging
+        Translate TranslateFunc = new Translate
         {
-            number = 2,
-            transition = Transition.Logarithmic,
-            translation = new PointSerializable(new Point(80, 10))
+            transition = Transition.None,
+            translation = new PointSerializable(new Point(3, 0))
         };
-        box.AddOnClick(func);
-        box.OnClick += () => Debug.WriteLine(box.GetJson());
+        ChangeColor ChangeColorFunc = new ChangeColor
+        {
+            NewColor = new Color(204, 0, 104)
+        };
+        box.AddOnHover(ChangeColorFunc);
+        box.AddOnHover(TranslateFunc);
+        box.AddOnClick(new Debugging());
         UI.Import(GraphicsDevice, _windowSize);
         UI.AddNewBox(box);
     }

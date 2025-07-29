@@ -27,6 +27,12 @@ namespace UI_Editor
         public bool IsInteractable = true;
         public bool IsVisible = true;
 
+        public Element(ElementSerializationData serializationData)
+        {
+            SerializationData = serializationData;
+            Load();
+        }
+
         public Element(Point position, Point size, string text, Color backgroundColor)
         {
             Position = position;
@@ -37,18 +43,20 @@ namespace UI_Editor
 
         public void Hovering()
         {
-            Console.WriteLine("Hovering");
+            if (OnHover == null)
+                Debug.WriteLine("OnHover is null");
             OnHover?.Invoke();
+            
         }
 
         public void Clicked()
         {
-            Console.WriteLine("Clicked");
             OnClick?.Invoke();
         }
 
         public void Update(Point windowSize)
         {
+            Load();
             Rectangle hitbox = GetRectangle(windowSize);
             if (hitbox.Contains(InputManager.GetMousePos()))
             {
@@ -56,7 +64,6 @@ namespace UI_Editor
                 if (InputManager.WasMouseButtonPressed(MouseButtons.LeftButton))
                     Clicked();
             }
-
         }
 
         public void AddOnHover(Functions function)
@@ -81,6 +88,8 @@ namespace UI_Editor
 
         public abstract void Draw(Texture2D _texture, SpriteBatch spriteBatch, Point windowSize);
 
+        public abstract void Load();
+
         //public void GetJsonString()
         //{
         //    string jsonText = JsonSerializer.Serialize( new
@@ -103,10 +112,28 @@ namespace UI_Editor
     {
         public const ElementType Type = ElementType.Box;
 
+        public Box(ElementSerializationData serializationData) : base (serializationData) { }
+
         public Box(Point position, Point size, string text, Color backgroundColor) : base(position, size, text, backgroundColor)
         {
             SerializationData = new ElementSerializationData(Type, position, size, text, backgroundColor, IsInteractable, IsVisible);
             Debug.WriteLine(SerializationData.Type.ToString());
+        }
+
+        public override void Load()
+        {
+            Position = SerializationData.Position.ToPoint();
+            Size = SerializationData.Size.ToPoint();
+            Text = SerializationData.Text;
+            BackgroundColor = SerializationData.BackgroundColor;
+            IsInteractable = SerializationData.IsInteractable;
+            IsVisible = SerializationData.IsVisible;
+            OnHover = null;
+            OnClick = null;
+            foreach (Functions function in SerializationData.OnHoverFunctions)
+                OnHover += () => function.Execute(this);
+            foreach (Functions function in SerializationData.OnClickFunctions)
+                OnClick += () => function.Execute(this);
         }
 
         public override void Draw(Texture2D _texture, SpriteBatch spriteBatch, Point windowSize)
